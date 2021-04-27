@@ -106,6 +106,21 @@
               <div class="post-footer">
                 <ul class="comments-list">
                   <?php
+                  if (isset($_SESSION['userId'])) {
+                  ?>
+                    <div class="input-group">
+                      <form class="input-group" method="POST" action="?action=newComment">
+                        <input name="postId" type="hidden" value="<?= $onePost['id'] ?>">
+                        <input name="comment" class="form-control" placeholder="Add a comment" type="text">
+                        <span class="input-group-text">
+                          <a href="#" onclick="$(this).closest('form').submit()"><i class="fa fa-edit"></i></a>
+                        </span>
+                      </form>
+                    </div>
+                  <?php
+                  }
+                  ?>
+                  <?php
                   $postId = $onePost['id'];
                   if (isset($comments[$postId])) {
                     foreach ($comments[$postId] as $comment) {
