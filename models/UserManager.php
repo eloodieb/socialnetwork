@@ -15,15 +15,33 @@ function GetAllUsers()
   return $response->fetchAll();
 }
 
+// function GetUserIdFromUserAndPassword($username, $password)
+// {
+//   global $PDO;
+//   $response = $PDO->query("SELECT id FROM user WHERE nickname = '$username' AND password = '$password'");
+//   $result = $response->fetchAll();
+//   $nbUsersWithPwdAndNickname = count($result);
+//   if ($nbUsersWithPwdAndNickname == 1) {
+//     $connectingUser = $result[0];
+//     return $connectingUser['id']; //on peut écrire $result[0]['id']
+//   } else {
+//     return -1;
+//   }
+// }
+
 function GetUserIdFromUserAndPassword($username, $password)
 {
   global $PDO;
-  $response = $PDO->query("SELECT id FROM user WHERE nickname = '$username' AND password = '$password'");
-  $result = $response->fetchAll();
-  $nbUsersWithPwdAndNickname = count($result);
-  if ($nbUsersWithPwdAndNickname == 1) {
-    $connectingUser = $result[0];
-    return $connectingUser['id']; //on peut écrire $result[0]['id']
+  $response = $PDO->prepare("SELECT id FROM user WHERE nickname = :username AND password = MD5(:password) ");
+  $response->execute(
+    array(
+      "username" => $username,
+      "password" => $password
+    )
+  );
+  if ($response->rowCount() == 1) {
+    $row = $response->fetch();
+    return $row['id'];
   } else {
     return -1;
   }
@@ -41,10 +59,23 @@ function IsNicknameFree($nickname)
   return $response->rowCount() == 0;
 }
 
+// function CreateNewUser($nickname, $password)
+// {
+//   global $PDO;
+//   $response = $PDO->prepare("INSERT INTO user (nickname, password) values (:nickname , :password )");
+//   $response->execute(
+//     array(
+//       "nickname" => $nickname,
+//       "password" => $password
+//     )
+//   );
+//   return $PDO->lastInsertId();
+// }
+
 function CreateNewUser($nickname, $password)
 {
   global $PDO;
-  $response = $PDO->prepare("INSERT INTO user (nickname, password) values (:nickname , :password )");
+  $response = $PDO->prepare("INSERT INTO user (nickname, password) values (:nickname , MD5(:password) )");
   $response->execute(
     array(
       "nickname" => $nickname,
